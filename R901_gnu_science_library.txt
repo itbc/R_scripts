@@ -1,0 +1,37 @@
+
+library( gsl )
+
+x <- seq( from = 0, to = 10, len = 100 )
+plot( c(0,11), c(-1,1), type = "n",
+	xlab = "", ylab = "", yaxt = "n", xaxt = "n",
+	frame = FALSE, 
+	main="modefied R code from vignette source
+	n(Fig 10.6, p446)" )
+axis( 1, pos = 0, at = c(0,2,4,6,8,10), labels = c("","2","4","6","8","10"))
+axis( 2, pos = 0 )
+lines( x, airy_Ai(x), type = "l", lty = 2, col = 2 )
+lines( x, airy_Ai(-x), type = "l", lty = 3, col = 3 )
+lines( x, airy_Ai_deriv(x), type = "l", lty = 4, col = 4 )
+lines( x, airy_Ai_deriv(-x), type = "l", lty = 5, col = 5 )
+text( 1, 0.6, "Ai(-x)" )
+text( 0.85, 0.33, "Ai(x)" )
+text( 1.08, -0.26, "Ai'(x)" )
+text( 10.5, 0.4,"Ai'(-x)" )
+arrows( 10, 0, 11, 0, angle = 11 )
+text( 11, -0.1, "x" )
+
+
+
+
+q <- qrng_alloc( dim = 2 )
+
+t <- qrng_name( q )
+
+par( mfrow=c(2,2) )
+
+for( i in 1:4 ){
+	j = i * 1000
+	data_q <- qrng_get( q, j )
+	plot( data_q, pch = 1, cex = 0.2, col = i, 
+	main = paste(t,"n", "count:", j) )
+}

@@ -1,0 +1,51 @@
+
+library( RMeCab )
+
+rlt <- RMeCabC( "空を自由に飛びたいな、とっても大好きねこ" )
+
+
+rlt1_1 <- RMeCabFreq( "wagahai.txt" )
+
+head( rlt1_1 )
+
+
+rlt1_2 <-order(rlt1_1$Freq, decreasing=TRUE)
+rlt1_3 <- rlt1_1[ rlt1_2, ]
+rlt1_3 <- subset( rlt1_3, rlt1_3$Info1=="名詞" & rlt1_3$Info2=="一般" )
+rlt1_3 <- rlt1_3[ 1:10, ]
+print( rlt1_3 )
+
+pie( rlt1_3$Freq, labels=rlt1_3$Term, clockwise=TRUE )
+
+
+rlt2_1 <- RMeCabFreq( "bochan.txt" )
+
+head( rlt1_1 )
+
+
+rlt2_2 <-order(rlt2_1$Freq, decreasing=TRUE)
+rlt2_3 <- rlt2_1[ rlt2_2, ]
+rlt2_3 <- subset( rlt2_3, rlt2_3$Info1=="名詞" & rlt2_3$Info2=="一般" )
+rlt2_3 <- rlt2_3[ 1:10, ]
+print( rlt2_3 )
+
+par( mfcol=c( 2, 1 ), mar=c( 1, 1, 1, 1 ) )
+pie( rlt1_3$Freq, labels=rlt1_3$Term, clockwise=TRUE )
+pie( rlt2_3$Freq, labels=rlt2_3$Term, clockwise=TRUE )
+
+
+library( wordcloud )
+
+rlt0 <- rlt1_1[ rlt1_2, ]
+rlt0 <- subset( rlt0, rlt0$Info1=="名詞" & rlt0$Info2=="一般" )
+
+length( rlt0[ , 4 ] )
+
+rlt0 <- rlt0[ 1:500, ]
+wordcloud( rlt0$Term, rlt0$Freq )
+
+if( require( RColorBrewer ) ){
+	pal <- brewer.pal( 7, "Pastel1" )
+	wordcloud( rlt0$Term, rlt0$Freq, c( 7, .3 ), 3, , TRUE, TRUE, .15, pal )
+}
+
