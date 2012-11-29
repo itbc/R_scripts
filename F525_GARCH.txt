@@ -1,0 +1,80 @@
+library( FinTS )
+library( forecast )
+library( fGarch )
+
+ts.plot( dem2gbp )
+
+tsdisplay( dem2gbp )
+
+for( n in 1:10 ) {
+	x <- ArchTest( dem2gbp, lag=n )
+	cat( "lag:", n ); print( x )
+}
+
+pp.test( as.matrix(dem2gbp) )
+
+adf.test( as.matrix(dem2gbp) )
+
+
+searchGarch <- function( n = 1, m = 0, dat ){
+	i <- 1
+	rlt <- matrix( 0, n*(m + 1), 2 )
+
+	for( n in 1:n ){
+		for( m in 0:m ){
+			mdl <- paste( "~garch(", n,",", m, ")" ) 
+			f1 <- formula( mdl ) 	
+			a <- garchFit( formula = f1, data = dat, trace=FALSE )
+			rlt[i,1] <- a@fit$ics[1]
+			rlt[i,2] <- mdl
+			i = i + 1
+		}
+	}
+	colnames( rlt ) <- c( "AIC", "Formula" ) 
+	order_rlt <- order( rlt[,1], rlt[,2] )
+	print( rlt[order_rlt,] )
+}
+
+searchGarch( 4, 5, dem2gbp )
+
+
+data1 <- garchFit( formula = ~garch(1, 4), data = dem2gbp )
+
+data1@fit$ics
+
+summary( data1 )
+
+auto.arima( as.matrix(dem2gbp) )
+
+ts.plot( data1@residuals )
+
+for( n in 1:10 ) {
+	x <- ArchTest( data1@residuals, lag=n )
+	cat( "lag:", n ); print( x )
+}
+
+lag.plot( data1@residuals, set = 1:20, pch = ".", col = "blue" )
+
+
+
+library( compiler )
+
+searchGarch.cpl <- cmpfun( searchGarch )
+
+#system.time( searchGarch.cpl(10, 10, dem2gbp) )
+
+#system.time( searchGarch(10, 10, dem2gbp) )
+
+par( mfrow = c(2, 2) )
+
+plot( data1 )
+
+predict( data1, n.ahead = 100, plot = TRUE, conf = .95 )
+
+
+
+spec = garchSpec( model = list(alpha = c(0.3, 0.1), beta = 0.2) )
+
+data2 <- garchSim( spec, n = 10000 )
+
+searchGarch.cpl( 3, 3, data2 )

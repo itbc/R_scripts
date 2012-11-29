@@ -1,0 +1,50 @@
+library( urca )
+
+data( finland )
+
+head( finland )
+
+ts.plot( finland )
+
+data1 <- ca.jo( finland, ecdet = "none", type = "eigen",
+	K = 2, spec = "longrun", season = 4 )
+
+summary( data1 )
+
+
+
+
+data2 <- ca.jo( finland, ecdet = "none", type = "trace",
+	K = 2, spec = "longrun", season = 4 )
+
+summary( data2 )
+
+
+data3 <- ca.po( finland, type = "Pz" )
+
+summary( data3 )
+
+
+data( denmark )
+
+head( denmark )
+
+data_d <- denmark[, c("LRM", "LRY", "IBO", "IDE")]
+
+data4 <- ca.jo( data_d, ecdet = "const", type = "eigen",
+	K = 2, spec = "longrun", season = 4 )
+
+summary( data4 )
+
+plot( data4 )
+
+datH <- matrix( c(1, -1, 0, 0, 0, 0, 0, 1, -1, 0, 0, 
+	0, 0, 0, 1), c(5,3) )
+
+datA <- matrix( c(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+	 1), c(4,3) )
+
+
+data5 <- ablrtest( data4, H = datH, A = datA, r = 1 )
+
+summary( data5 )

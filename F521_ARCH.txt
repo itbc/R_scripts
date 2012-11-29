@@ -1,0 +1,53 @@
+
+library( FinTS )
+library( forecast )
+library( fGarch )
+
+data( sp500 )
+
+plot( sp500 )
+
+tsdisplay( sp500 )
+
+auto.arima( sp500 )
+
+
+for( n in 1:10 ) {
+	x <- ArchTest( sp500, lag=n )
+	cat( "lag:", n ); print( x )
+}
+
+
+n <- 1
+m <- 0
+i <- 1
+rlt <- matrix(0, 7, 2)
+
+for( n in 1:7 ){
+		mdl <- paste( "~garch(", n,",", m, ")" ) 
+		f1 <- formula( mdl ) 	
+		a <- garchFit( formula = f1, data = sp500, trace=FALSE )
+		rlt[i,1] <- a@fit$ics[1]
+		rlt[i,2] <- mdl
+		i = i + 1
+}
+
+colnames( rlt ) <- c( "AIC", "Formula" ) 
+order_rlt <- order( rlt[,1], rlt[,2] )
+rlt[ order_rlt, ]
+
+
+pp.test( as.matrix(sp500) )
+
+data2 <- garchFit( formula = ~garch( 1, 0 ), data = sp500 )
+
+summary( data2 )
+
+predict( data2, n.ahead = 30, plot = TRUE, conf = .99 )
+
+garchSpec( model = list(mu = 0.0075055, omega = 0.0027415, 
+			alpha = 0.1747721, beta = 0 ) )
+
+par( mfrow = c(2, 2) ) 
+
+plot( data1 )

@@ -1,0 +1,51 @@
+
+library( vars )
+library( urca )
+
+data( Canada )
+
+Canada
+
+for( i in 1:4 ){
+	data <- ur.df( Canada[,i], lags = 1, type = "none" )
+	print( (attr(Canada, "dimnames")[[2]][i]) )
+	print( summary(data) )
+}
+
+
+VARselect( Canada, lag.max = 5, type = "const" )
+
+data1 <- VAR( Canada, p = 2, type = "const" )
+
+summary( data1 )
+
+causality( data1, cause = "e" )
+
+causality( data1, cause = "prod" )
+
+causality( data1, cause = "rw" )
+
+causality( data1, cause = "U" )
+
+
+
+data1_1 <- irf( data1, impulse = "e", 
+	response = c("prod", "rw", "U"), boot = FALSE)
+
+plot( data1_1 )
+
+data1_2 <- irf( data1, impulse = "U", 
+	response = c("e", "prod", "rw"), boot = FALSE)
+
+plot( data1_2 )
+
+
+plot( data1 )
+
+data1_3 <- predict( data1, n.ahead = 15, ci = 0.99 )
+
+plot( data1_3 )
+
+data1_4 <- stability( data1, type = "Rec-CUSUM" )
+
+plot( data1_4 )

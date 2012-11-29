@@ -1,0 +1,37 @@
+
+library( forecast )
+
+treering
+
+plot( treering )
+
+pp.test( treering )
+
+tsdisplay( treering )
+
+data1 <- auto.arima( treering )
+
+data1
+
+Box.test( data1$res, type="Ljung-Box" )
+
+tsdiag( data1 )
+
+
+library( fArma )
+
+set.seed( 123 )
+
+data2 <- armaSim( model=list( ar=c( 0.8, -0.7 ), ma=0.3 ), n=2000 )
+
+data2
+
+auto.arima( data2 )
+
+data3 = armaFit(~ arma( 2, 1 ), data = data2, include.mean=FALSE )
+
+data3
+
+par( mfrow=c( 2, 2 ) )
+
+summary( data3 )

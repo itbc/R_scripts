@@ -1,0 +1,39 @@
+
+library( compiler )
+
+test1 <- function( x ) {
+	y <- matrix( 0, x, x )
+	z <- matrix( 0, x, x )
+	for( j in 1:nrow(y) ) y[j,] = rnorm( ncol(y) )
+	for( j in 1:nrow(z) ) z[j,] = rnorm( ncol(z) )
+	data1 <- sum( diag((y %*% z) %*% y) )
+	return( data1 )
+}
+
+
+test1_cmp <- cmpfun( test1 )
+
+
+system.time( test1(250:150) )
+
+
+system.time( test1_cmp(250:150) )
+
+
+
+test2 <- function( x, f ){
+    func <- match.fun( f )
+    if( !is.list(x) ) x <- as.list( x )
+    val <- list( length(x) )
+    for( i in seq(along=x) ){
+        v <- func( x[[i]] )
+        val[[i]] <- v
+    }
+    return( val )
+}
+
+test2_cmp <- cmpfun( test2 )
+
+system.time( test2( 1:1e+4 , is.numeric ) )
+
+system.time( test2_cmp( 1:1e+4, is.numeric ) )

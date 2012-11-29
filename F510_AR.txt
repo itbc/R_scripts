@@ -1,0 +1,156 @@
+
+sunspot.year
+
+plot( sunspot.year ) 
+
+acf( sunspot.year )
+
+pacf( sunspot.year )
+
+
+data1 <- ar( sunspot.year )
+
+data1
+
+str( data1 )
+
+data1$aic
+
+
+plot( data1$resid )
+
+
+
+
+library( fGarch )
+
+dem2gbp
+
+data1 <- dem2gbp[ , 1 ]
+
+plot( data1, type="l" )
+
+acf( data1 )
+
+pacf( data1 )
+
+
+rlt1 <- ar( data1, method="ols" )
+
+rlt1
+
+rlt1$aic
+
+
+rlt1 <- ar( data1, method="mle" )
+
+rlt1
+
+rlt1$aic
+
+library( forecast )
+
+tsdisplay( nottem )
+
+data3 <- ar( nottem )
+
+data3
+
+data3$aic
+
+
+nottem
+
+seasonplot( nottem, col=rainbow( 12 ), year.labels=TRUE )
+
+lag.plot( nottem, set = 1:20, pch = ".", col = "blue" )
+
+auto.arima( nottem )
+
+data4 <-decompose( nottem )
+
+plot( data4 )
+
+data4$seasonal
+
+data5 <- as.matrix( data4$seasonal )
+
+dat <- as.matrix( nottem )
+
+
+n <- 1
+i <- 1
+j <- 1
+xn <- matrix( 0, 240, 13 )
+
+while( j < 14 ){
+	while( n  j ){
+			xn[ n, j ] <- dat[ n - j ]
+		}else{
+			xn[ n, j ] <- 0
+		}
+		n <- n + 1
+	}
+	j <- j + 1
+	n <- 1
+}
+
+
+x <- seq(1920, 1940, by = 1/12)[ 1:240 ] 
+
+yn <- ( 0.4781*xn[,1] + 0.0664*xn[,2] - 0.1848*xn[,3] - 0.1959*xn[,4] 
+		- 0.0154*xn[,5] - 0.0402*xn[,6] - 0.0553*xn[,7] - 0.1069*xn[,8] 
+		+ 0.0028*xn[,9] + 0.0124*xn[,10] + 0.1719*xn[,11] 
+		+ 0.0372*xn[,12] + 0.0995*xn[,13] )
+
+plot( nottem, xlim=c(1920, 1940), ylim=c(30, 70) )
+par( new=T )
+plot( x, yn, type="l", col="blue", xlab="", ylab="" )
+
+
+
+n <- 1
+i <- 1
+j <- 1
+xm <- matrix( 0, 240, 3 )
+
+while( n  1 ){
+		xm[ n, 1 ] <- dat[ n - 1 ]
+		xm[ n, 2 ] <- data5[ n - 1 ]
+	}else{
+		xm[ n, 1 ] <- 0
+		xm[ n, 2 ]  2 ){
+		xm[ n, 3 ] <- data5[ n - 2 ]
+	}else{
+		xm[ n, 3 ] <- 0
+	}
+	n <- n + 1
+}
+
+ym <- 0.3355*xm[,1] + 0.3012*xm[,2] + 0.6455*xm[,3] + 49.5242
+
+par( mfrow = c(2, 1) )  
+plot( nottem, xlim=c(1920, 1940), ylim=c(30, 70) )
+par( new=T )
+plot( x, yn, type="l", col="blue", xlab="", ylab="" )
+
+plot( nottem, xlim=c(1920, 1940), ylim=c(30, 70) )
+par( new=T )
+plot( x, ym, type="l", col="red", xlab="", ylab="" )
+
+
+plot( forecast( data3, h=120 ) )
+
+par( mfrow = c(2, 1) )  
+
+rlt_pre <- predict( data3, n.ahead = 120 )
+pre_low1 <- rlt_pre$pred - 2.33 * rlt_pre$se
+pre_high1 <- rlt_pre$pred + 2.33 * rlt_pre$se
+
+ts.plot( nottem, pre_low1, pre_high1 )
+
+rlt_pre <- predict( data3, n.ahead = 120 )
+pre_low1 <- rlt_pre$pred - 1.96 * rlt_pre$se
+pre_high1 <- rlt_pre$pred + 1.96 * rlt_pre$se
+
+ts.plot( nottem, pre_low1, pre_high1 )

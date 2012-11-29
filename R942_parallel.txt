@@ -1,0 +1,28 @@
+
+library( snowfall )
+
+for(i in 1:5 ){
+	sfInit( parallel=TRUE, cpus=i )
+	test1 <- function( x ) {
+		y <- matrix( 0, x, x )
+		z <- matrix( 0, x, x )
+		for( j in 1:nrow(y) ) y[j,] = rnorm( ncol(y) )
+		for( j in 1:nrow(z) ) z[j,] = rnorm( ncol(z) )
+		data1 <- sum( diag((y %*% z) %*% y) )
+		return( data1 )
+	}
+	print( system.time(result <- sfClusterApplyLB(0:200, test1)) )
+	sfStop()
+}
+
+
+library( rugarch )
+
+data( dji30ret )
+
+for( i in 1:5 ){
+	spec = ugarchspec()
+	spec_m = multispec( replicate(spec, n = 30) )
+	print( system.time(multifit(multispec = spec_m, data = dji30ret[,1:30], 
+	parallel = TRUE, parallel.control = list(pkg = "snowfall", cores = i))) )
+}

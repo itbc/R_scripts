@@ -1,0 +1,72 @@
+
+library( forecast )
+
+tsdisplay( WWWusage )
+
+data1 <- auto.arima( WWWusage )
+
+data1
+
+plot( forecast( data1, h=10 ) )
+
+tsdisplay( BJsales )
+
+data2 <- auto.arima( BJsales )
+
+data2
+
+plot( forecast( data2, h=10 ) )
+
+
+library( fArma )
+
+set.seed( 123 )
+
+data3 <- armaSim( model=list( ar=c( 0.3, -0.3 ), d=2, 
+				ma=c( 0.5, 0.7 ) ), n=2000 )
+
+data3
+
+auto.arima( data3 )
+
+data4 = armaFit(~ arima( 2, 2, 2 ), data = data3, include.mean=FALSE )
+
+data4
+
+par( mfrow=c( 2, 2 ) )
+
+summary( data4 )
+
+n <- 1
+m <- 0
+i <- 1
+rlt <- matrix(0, 16, 2)
+
+for( n in 0:3 ){
+	for( m in 0:3 ){
+		mdl <- paste( "~arima(", n,", 2 ,", m, ")" ) 
+		f1 <- formula( mdl ) 	
+		a <- armaFit( formula = f1, data = data3, include.mean = FALSE )
+		rlt[i,1] <- a@fit$aic
+		rlt[i,2] <- mdl
+		i = i + 1
+	}
+}
+colnames( rlt ) <- c( "AIC", "Formula" ) 
+order_rlt <- order( rlt[,1], rlt[,2] )
+rlt[ order_rlt, ]
+
+data5 <- arima( data3, c( 2, 2, 2 ), include.mean=FALSE )
+
+data5
+
+data5$model
+
+data6 <- KalmanLike( data3, data5$model, nit = 0 )
+ 
+data6
+
+data7 <- KalmanForecast( 100, data5$model )
+ 
+data7
+

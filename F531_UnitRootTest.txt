@@ -1,0 +1,53 @@
+
+library( urca )
+
+data( nporg )
+
+head( nporg )
+
+data1 <- na.omit( nporg[, "gnp.r"] )
+
+data1_log <- log( data1 )
+
+ts.plot( data1 )
+
+data1_ers <- ur.ers( data1, type = "DF-GLS", 
+	model = "trend", lag.max = 4 )
+
+summary( data1_ers )
+
+plot( data1_ers )
+
+
+data1_kpss <- ur.kpss( data1_log, type = "tau", 
+	lags = "short" )
+
+summary( data1_kpss )
+
+plot( data1_kpss )
+
+data1_pp <- ur.pp( data1, type = "Z-tau", 
+	model = "trend", lags = "short" )
+
+summary( data1_pp )
+
+plot( data1_pp )
+
+data_sp <- ur.sp( data1, type = "tau", 
+	pol.deg = 1, signif = 0.01 )
+
+summary( data_sp ) 
+
+plot( data_sp )
+
+data_za <- ur.za( data1, model = "both", lag = 2 )
+
+summary( data_za )
+
+plot( data_za )
+
+data_df <- ur.df( data1, lags = 2, type = "trend" )
+
+summary( data_df )
+
+plot( data_df )
